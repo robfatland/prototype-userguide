@@ -11,10 +11,10 @@ source wins.
 
 Status (Nov 2026): **working demo.** Corpus live on GitHub Pages with three guide pages:
 `shallow-profiler.md` (operations, daily index, profile index / GPI, redux), `ctd.md` (CTD + DO),
-and `flort.md` — each grounded in real delivered files / verified data, with impact-rated caveats.
-Bedrock client (`client/ask.py`, Sonnet 4.6 via profile `securecomputing`) answers end-to-end;
-tests R1–R3 passed, with every error fed back into the corpus or the client prompt. v1 in
-progress: nitrate, pH, pCO₂, PAR next. Remaining v0 pages (data access, QC flags, currents,
+`nitrate.md`, and `flort.md` — each grounded in real delivered files / verified data, with
+impact-rated caveats. Bedrock client (`client/ask.py`, Sonnet 4.6 via profile `securecomputing`)
+answers end-to-end; tests R1–R4 passed (R4: first multi-page synthesis), with every error fed back
+into the corpus or the client prompt. v1 in progress: pH, pCO₂, PAR next. Remaining v0 pages (data access, QC flags, currents,
 reference indexes, Zenodo catalog) not yet written.
 
 
@@ -284,7 +284,12 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
 - [x] `client/ask.py` written; first FLORT question run (see Results).
 - [ ] Run the remaining FLORT questions; record results.
 - [x] v1 `ctd.md` (CTD + DO) written, grounded in a real file; R2 passed.
-- [ ] v1 `nitrate.md`, `ph.md`, `pco2.md`, `par.md`.
+- [x] v1 `nitrate.md` written (deployment-6 file); R4 cross-page test passed.
+- [ ] v1 `ph.md`, `pco2.md`, `par.md`.
+- [ ] Report to data team (LOW): nitrate instrument clock fields (`internal_timestamp`,
+      `date_of_sample`) lag `time` by weeks–months from ~Oct 2018 in deployment 6.
+- [ ] Verify: SUNA accuracy/drift wording ("offsets of a few µmol L⁻¹") against the BGC Best
+      Practices nitrate chapter.
 - [x] Client system prompt: exact ratings, corpus-only URLs, keep qualifiers (after R2a/R2b/R3).
 - [x] `shallow-profiler.md` written (platform, phases + verified durations, daily index in the
       UTC day, profile index / GPI + slicing code, redux convention, UTC); R3 passed.
@@ -366,6 +371,21 @@ day?"*
   was the page leaving it unrated. Fix: `shallow-profiler.md` now rates it [HIGH]. Lesson: when
   the FM consistently "drifts" a rating, check whether the page under-rates the claim before
   blaming the model.
+
+**R4 (nitrate + CTD, cross-page synthesis).** *"I want to compare nitrate and dissolved oxygen
+profiles from the Slope Base shallow profiler to study remineralization. Which variables do I
+use, how do I match them up, and what should I watch out for?"*
+
+- Fetched: `nitrate.md`, `ctd.md`, `shallow-profiler.md` (chosen by the FM). Tokens: 13,374 in /
+  1,888 out (~10 cents).
+- Verdict: **very good — first multi-page synthesis.** Correct variables from both instruments;
+  the µmol L⁻¹ vs µmol kg⁻¹ conversion with in-situ density (the right density for a volume
+  conversion); restrict CTD to the same #4/#9 GPIs, slice both by `start→peak`, bin to a common
+  depth grid; bottle-check caveat; near-zero negatives; nitrate inherits CTD fouling; oxygen lag;
+  σ₀ for density surfaces; stuck-value warning; use `time`.
+- Errors: minor rating slip — the [LOW] instrument-clock issue was folded under a [HIGH] "Time"
+  heading. No factual errors found.
+- Fixes: none needed to the corpus.
 
 
 
