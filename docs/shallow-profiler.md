@@ -54,7 +54,8 @@ Base profile index, medians):
 - **Profiles #4 and #9 are special:** they have the long (~95 min), stop-and-go descents
   (verified). #4 peaks around **08:30 UTC ≈ local midnight**; #9 around **21:50 UTC ≈ 13:50 local**
   (Pacific standard time; an hour later in local daylight time).
-- **Sensor duty cycles** (from 2017 on; in 2015–2016 the sparse sensors ran on more profiles):
+- **[HIGH] Sensor duty cycles differ** — expecting nitrate, pH, or pCO₂ on every profile will
+  mislead you (from 2017 on; in 2015–2016 the sparse sensors ran on more profiles):
 
   | Sensors | Profiles | Phase | Points per profile |
   |---|---|---|---|

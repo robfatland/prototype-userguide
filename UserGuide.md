@@ -361,6 +361,11 @@ day?"*
 - Fixes: client system prompt now requires ratings copied exactly (never raised/lowered/invented),
   only URLs present in fetched pages, and page qualifiers kept (dates, "in the example file",
   "project experience").
+- **R3b (re-run with the stricter prompt):** "from 2017 onward" now kept ✓; the FM still rated
+  the duty-cycle statement [HIGH]. Judgment: the FM was right that it is high-impact — the gap
+  was the page leaving it unrated. Fix: `shallow-profiler.md` now rates it [HIGH]. Lesson: when
+  the FM consistently "drifts" a rating, check whether the page under-rates the claim before
+  blaming the model.
 
 
 
