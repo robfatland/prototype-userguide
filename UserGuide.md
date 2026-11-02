@@ -9,11 +9,13 @@ Amazon Bedrock, answers practical data questions well using only that corpus.
 page links to its primary sources; where this guide and an official source disagree, the official
 source wins.
 
-Status (Nov 2026): **working demo.** Corpus live on GitHub Pages; FLORT guide written (grounded in
-a real delivered file, impact-rated caveats); Bedrock client (`client/ask.py`, Sonnet 4.6 via
-profile `securecomputing`) answers end-to-end; first test (R1) passed with fixes fed back into the
-corpus. Remaining v0 pages (data access, QC flags, currents, reference indexes, Zenodo catalog)
-not yet written. Proposed v1: CTD + DO, pCO₂, pH, nitrate, PAR (see "Scope and phasing").
+Status (Nov 2026): **working demo.** Corpus live on GitHub Pages with three guide pages:
+`shallow-profiler.md` (operations, daily index, profile index / GPI, redux), `ctd.md` (CTD + DO),
+and `flort.md` — each grounded in real delivered files / verified data, with impact-rated caveats.
+Bedrock client (`client/ask.py`, Sonnet 4.6 via profile `securecomputing`) answers end-to-end;
+tests R1–R3 passed, with every error fed back into the corpus or the client prompt. v1 in
+progress: nitrate, pH, pCO₂, PAR next. Remaining v0 pages (data access, QC flags, currents,
+reference indexes, Zenodo catalog) not yet written.
 
 
 ## How to install and operate a Python Client
@@ -283,10 +285,14 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
 - [ ] Run the remaining FLORT questions; record results.
 - [x] v1 `ctd.md` (CTD + DO) written, grounded in a real file; R2 passed.
 - [ ] v1 `nitrate.md`, `ph.md`, `pco2.md`, `par.md`.
-- [ ] Client system prompt: forbid citing URLs not present in the corpus (R2a); ask the FM to
-      keep the page's impact ratings unchanged (R2b rating drift).
-- [ ] Proposed page `shallow-profiler.md` (operations: profiles, daily index, profile index /
-      GPI, ascent vs descent, redux sharding) — awaiting go-ahead.
+- [x] Client system prompt: exact ratings, corpus-only URLs, keep qualifiers (after R2a/R2b/R3).
+- [x] `shallow-profiler.md` written (platform, phases + verified durations, daily index in the
+      UTC day, profile index / GPI + slicing code, redux convention, UTC); R3 passed.
+- [ ] Re-run R2/R3 with the new system prompt to confirm rating drift is gone.
+- [ ] argosy fixes found while writing: `plume/ColumbiaPlumePlan.md` gives oo latitude 44.66
+      (code uses 44.374); `SensorTable.md` calls PCO2W a Pro-Oceanus CO2-Pro (files say SAMI) —
+      verify at the pCO₂ page; `Sharding.md` says daily index 8 has an extended descent (2024
+      index shows only #4 and #9 do).
 - [ ] Process rule: never batch a page write and its `git commit`; verify the page is tracked and
       served (HTTP 200) before adding it to `llms.txt`.
 - [ ] Draft the v0 test bank (≈ 15 questions).
@@ -341,6 +347,20 @@ write/commit race; fixed).
   in the corpus, so the answer stopped at "apply your MLD algorithm".
 - Fixes: `ctd.md` gains an MLD section (de Boyer Montégut 2004 threshold; Holte & Talley 2009
   hybrid; reference-depth caveat; the argosy hand-labeled MLD set on Zenodo).
+
+**R3 (shallow-profiler operations).** *"I have a month-long nitrate file from the Slope Base
+shallow profiler. How do I pull out the individual nitrate profiles, and why do I only see two per
+day?"*
+
+- Fetched: `shallow-profiler.md` only. Tokens: 6,342 in / 1,037 out.
+- Verdict: **good.** Correct "nitrate runs on #4 and #9"; the [HIGH] "don't find #4/#9 by
+  counting" warning with the long-descent test; profile-index URL + slicing code; GPI as the
+  cross-sensor key; pointed to redux as optional.
+- Errors: dropped the "from 2017 on" qualifier; attached a [HIGH] rating to a statement the page
+  leaves unrated (second instance of rating drift, after R2b).
+- Fixes: client system prompt now requires ratings copied exactly (never raised/lowered/invented),
+  only URLs present in fetched pages, and page qualifiers kept (dates, "in the example file",
+  "project experience").
 
 
 
