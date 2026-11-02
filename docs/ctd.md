@@ -139,6 +139,22 @@ profile (example file: min 67, median 94 µmol kg⁻¹) are real — the region 
 zone below — not a sensor fault.
 
 
+## Mixed layer depth (MLD) from these data
+
+- **Threshold method (standard):** MLD = the depth where potential density first exceeds its
+  value at a ~10 m reference depth by **0.03 kg m⁻³** (or temperature drops by 0.2 °C).
+  de Boyer Montégut et al. 2004, JGR, doi:10.1029/2004JC002378.
+- **Hybrid algorithm:** combines threshold, gradient, and curve-shape criteria; more robust on
+  messy profiles. Holte & Talley 2009, J. Atmos. Oceanic Technol., doi:10.1175/2009JTECHO543.1.
+- **[MEDIUM] Shallow-profiler caveat:** the profiler's shallowest point is often 5–20 m, sometimes
+  deeper — check that each profile actually reaches your reference depth before applying a
+  threshold; otherwise the "MLD" is undefined, not shallow.
+- **Hand-labeled MLDs for validation:** a single-annotator set of human-picked MLDs on Slope Base,
+  Oregon Offshore, and Axial Base shallow-profiler profiles (temperature, salinity, density, DO),
+  intended as training/validation data. Zenodo, concept DOI 10.5281/zenodo.23650418
+  *(argosy project)*.
+
+
 ## Shallow profiler specifics
 
 - **[HIGH]** The delivered stream is **continuous**: it includes time parked at the ~200 m

@@ -281,6 +281,14 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
       `us.anthropic.claude-sonnet-4-6` — test call OK; no IAM or console changes needed.
 - [x] `client/ask.py` written; first FLORT question run (see Results).
 - [ ] Run the remaining FLORT questions; record results.
+- [x] v1 `ctd.md` (CTD + DO) written, grounded in a real file; R2 passed.
+- [ ] v1 `nitrate.md`, `ph.md`, `pco2.md`, `par.md`.
+- [ ] Client system prompt: forbid citing URLs not present in the corpus (R2a); ask the FM to
+      keep the page's impact ratings unchanged (R2b rating drift).
+- [ ] Proposed page `shallow-profiler.md` (operations: profiles, daily index, profile index /
+      GPI, ascent vs descent, redux sharding) — awaiting go-ahead.
+- [ ] Process rule: never batch a page write and its `git commit`; verify the page is tracked and
+      served (HTTP 200) before adding it to `llms.txt`.
 - [ ] Draft the v0 test bank (≈ 15 questions).
 - [ ] Remaining v0 pages: data access, QC flags, currents, two reference indexes.
 - [ ] `tools/zenodo_catalog.py` → `docs/datasets.md`.
@@ -310,6 +318,29 @@ for backscatter, and should I throw out samples whose qc_results show a failed t
   quantization, which fits chlorophyll but not backscatter (~75 counts above dark, 99% failures).
 - Fixes: `flort.md` now separates chlorophyll (quantization) from backscatter (likely threshold),
   and states the 0-bit = "failed or not run" rule explicitly.
+
+**R2a (CTD, page missing — accidental robustness test).** *"I want to compute mixed layer depth
+from shallow profiler CTD data at Slope Base. Which variables should I use, and what pitfalls
+should I watch for?"* — asked while `ctd.md` was listed in `llms.txt` but not yet published (a
+write/commit race; fixed).
+
+- Fetched: `ctd.md` → HTTP 404. Tokens: 3,315 in / 827 out.
+- Verdict: **good failure behavior.** Reported the 404, answered only from the index summary,
+  refused to guess variable names, said so plainly. One flaw: offered an unverified OOI URL
+  (`/data-product/ctdpff/`) as a fallback.
+- Lesson: an index entry must never point at an unpublished page; and the system prompt should
+  forbid citing URLs that aren't in the corpus.
+
+**R2b (CTD, same question, page live).**
+
+- Fetched: `ctd.md` only. Tokens: 6,555 in / 1,369 out.
+- Verdict: **good.** Correct variables; the [HIGH] in-situ-density warning with the GSW σ₀ recipe;
+  split the stream with profileIndices; ascent only; conductivity-fouling windows; stuck-value
+  warning; sensible 6-step workflow; cited sources.
+- Errors: promoted two [MEDIUM] caveats to [HIGH] (rating drift). Gap: no MLD *method* guidance
+  in the corpus, so the answer stopped at "apply your MLD algorithm".
+- Fixes: `ctd.md` gains an MLD section (de Boyer Montégut 2004 threshold; Holte & Talley 2009
+  hybrid; reference-depth caveat; the argosy hand-labeled MLD set on Zenodo).
 
 
 
