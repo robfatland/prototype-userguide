@@ -69,7 +69,13 @@ Verified in the example file by placing every sample in the profile cycle:
 - **[HIGH] ~2,600 more samples are taken while the profiler is parked at the ~190 m platform**
   (between profiles). They are **not profiles** — but they form a useful **near-platform pCO₂ time
   series**. Separate them before profile work.
+- **[HIGH] Find #4 and #9 by their long descent, not by counting.** In the profile index,
+  #4/#9 are the profiles with `end − peak` well above ~60 min (~95 min vs ~34 min for the others).
+  Counting "the 4th profile of the day" fails on any day with a missing profile.
 - Cut profiles with `peak → end` (descent) from the profile index.
+- **Not the same as pH:** pCO₂'s ~190 m readings are taken **while parked** between profiles;
+  pH's are **one per ordinary profile** at the bottom of its descent. Both are off-profile, but
+  different patterns.
 - **[MEDIUM]** Like pH, pCO₂ is a **descent** measurement while CTD/FLORT/nitrate are ascent —
   match on GPI and accept (or account for) the ~1 h offset.
 

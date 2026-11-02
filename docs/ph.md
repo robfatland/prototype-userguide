@@ -71,7 +71,13 @@ Verified in the example file by placing every sample in the profile cycle:
   at the bottom of its descent. They are **not profiles**. Treat them as a near-platform time
   series (up to 7 per day; ~5 per day in the example file), or drop them before profile work. *(Consistent with argosy,
   `SensorTable.md`.)*
+- **[HIGH] Find #4 and #9 by their long descent, not by counting.** In the profile index,
+  #4/#9 are the profiles with `end − peak` well above ~60 min (~95 min vs ~34 min for the others).
+  Counting "the 4th profile of the day" fails on any day with a missing profile.
 - Cut profiles with `peak → end` (descent) from the profile index — **not** `start → peak`.
+- **Not the same as pCO₂:** pH's ~190 m readings are **one per ordinary profile** (at the bottom
+  of its descent); pCO₂'s are taken **while parked** between profiles. Both are off-profile — drop
+  or separate them — but they are different sampling patterns.
 - **[MEDIUM]** pH is measured on **descent**, while the CTD, FLORT, and nitrate science data are
   ascent. When pairing pH with other variables, match on GPI and use the *same* phase where
   possible (e.g. the pH file's own temperature, salinity, and depth), or accept the ~1 h ascent →

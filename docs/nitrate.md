@@ -67,8 +67,11 @@ From a real file: Slope Base shallow profiler, `RS01SBPS-SF01A-4A-NUTNRA101`, st
 
 - **[HIGH] Only two profiles a day — #4 (~local midnight) and #9 (~13:50 local) — and only on
   the ascent** (from 2017 on). Verified in the example file: **563 of 570** nitrate profiles fall
-  on the long-descent #4/#9 profiles (the 7 exceptions are worth checking individually). See
-  [Shallow profiler operations](shallow-profiler.md) for how to identify #4/#9 safely.
+  on the long-descent #4/#9 profiles (the 7 exceptions are worth checking individually).
+- **[HIGH] Find #4 and #9 by their long descent, not by counting.** In the profile index,
+  #4/#9 are the profiles with `end − peak` well above ~60 min (~95 min vs ~34 min for the others).
+  Counting "the 4th profile of the day" fails on any day with a missing profile. (More in
+  [Shallow profiler operations](shallow-profiler.md).)
 - **~170 samples per ascent**, mostly ~40 s apart — roughly **one sample per 1–2 m** of depth.
   Coarser than the CTD (1 Hz); fine for nutriclines, too coarse for thin layers.
 - Median coverage per profile: **~8 m to ~189 m**.

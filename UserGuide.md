@@ -11,10 +11,10 @@ source wins.
 
 Status (Nov 2026): **working demo.** Corpus live on GitHub Pages with three guide pages:
 `shallow-profiler.md` (operations, daily index, profile index / GPI, redux), `ctd.md` (CTD + DO),
-`nitrate.md`, and `flort.md` — each grounded in real delivered files / verified data, with
+`nitrate.md`, `ph.md`, `pco2.md`, and `flort.md` — each grounded in real delivered files / verified data, with
 impact-rated caveats. Bedrock client (`client/ask.py`, Sonnet 4.6 via profile `securecomputing`)
-answers end-to-end; tests R1–R4 passed (R4: first multi-page synthesis), with every error fed back
-into the corpus or the client prompt. v1 in progress: pH, pCO₂, PAR next. Remaining v0 pages (data access, QC flags, currents,
+answers end-to-end; tests R1–R5 passed (R4: first multi-page synthesis), with every error fed back
+into the corpus or the client prompt. Also live: `ph.md`, `pco2.md`. v1 remaining: PAR. Remaining v0 pages (data access, QC flags, currents,
 reference indexes, Zenodo catalog) not yet written.
 
 
@@ -163,6 +163,11 @@ some matter, many don't. Each caveat in a guide page carries a tag:
 
 The rating is what makes a page a *user guide* rather than a defect list: it tells the scientist
 what to act on now and what to merely know about.
+
+**Writing rule — inline every [HIGH] rule where it applies.** Don't rely on the FM following a
+link to another page for a [HIGH] caveat; it often answers from the page it has (R5). Repeat the
+rule in one or two lines and link for detail. Likewise, when two sensors have similar-but-
+different behavior, say how they differ explicitly — otherwise the FM may merge them (R5).
 
 
 ## Scope and phasing
@@ -392,6 +397,23 @@ use, how do I match them up, and what should I watch out for?"*
 - Errors: minor rating slip — the [LOW] instrument-clock issue was folded under a [HIGH] "Time"
   heading. No factual errors found.
 - Fixes: none needed to the corpus.
+
+**R5 (pH + pCO₂, carbonate system).** *"I downloaded pH and pCO2 files from the Slope Base
+shallow profiler for a year. I see lots of samples near 190 m and only a few points per profile.
+How do I get clean pH and pCO2 profiles, and can I compute the full carbonate system from them?"*
+
+- Fetched: `ph.md`, `pco2.md` (not `shallow-profiler.md`). Tokens: 9,205 in / 1,409 out.
+- Verdict: **mostly good.** Correct variables; descents of #4/#9 only with `peak → end`; ~12–13
+  readings per descent; QARTOD screening and range check for pH; "rely on QARTOD" for pCO₂; the
+  PyCO2SYS route with the [MEDIUM] "pH + pCO₂ is a poor pair" caveat; descent-vs-ascent offset;
+  bottle validation.
+- Errors (both corpus-caused): (1) conflated the two off-profile patterns ("both … take readings
+  at 190 m continuously") — pH's are one per ordinary profile, pCO₂'s are taken while parked;
+  the pages described each but never contrasted them. (2) Missed the [HIGH] "don't find #4/#9 by
+  counting" rule because the pages only linked to the operations page and the FM didn't fetch it.
+- Fixes: both pages now inline the [HIGH] long-descent rule and explicitly contrast the pH vs pCO₂
+  off-profile patterns. **Corpus lesson: never rely on the FM following a link for a [HIGH]
+  rule — inline it where it applies.**
 
 
 
