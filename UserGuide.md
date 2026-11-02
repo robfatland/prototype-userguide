@@ -16,6 +16,58 @@ corpus. Remaining v0 pages (data access, QC flags, currents, reference indexes, 
 not yet written. Proposed v1: CTD + DO, pCO₂, pH, nitrate, PAR (see "Scope and phasing").
 
 
+## How to install and operate a Python Client
+
+You don't need our client at all — any AI that can read a URL can use the corpus (see "How it
+works" below). This client exists to run the loop under your control, on Amazon Bedrock.
+
+**Install (once):**
+
+1. **Python 3.9+** with `boto3` (≥ 1.34, for the Converse API). Any env works; a small dedicated
+   one keeps things clean:
+   ```bash
+   conda create -n userguide python=3.11 boto3 -y   # or: python -m venv .venv && pip install boto3
+   conda activate userguide
+   ```
+2. **Get the client:** `git clone https://github.com/robfatland/prototype-userguide` (or just
+   download `client/ask.py` — it's one file, no other dependencies).
+3. **AWS credentials** with Bedrock access, configured as a named AWS CLI profile
+   (`aws configure --profile <name>`). Never put keys in code.
+4. **Model access:** in the Bedrock console, in your region, make sure the model is available to
+   your account. Newer models are invoked by **inference-profile ID** (e.g.
+   `us.anthropic.claude-sonnet-4-6`).
+5. **Check it works** (a few tokens, a fraction of a cent):
+   ```bash
+   aws bedrock-runtime converse --profile <name> --region us-west-2 \
+     --model-id us.anthropic.claude-sonnet-4-6 \
+     --messages '[{"role":"user","content":[{"text":"Reply with exactly: OK"}]}]' \
+     --inference-config '{"maxTokens":10}' --query 'output.message.content[0].text'
+   ```
+   `OK` back = model access and IAM are fine. `AccessDeniedException` = your IAM identity needs
+   `bedrock:InvokeModel` on the inference profile and its models.
+
+**Operate:**
+
+```bash
+cd prototype-userguide
+python client/ask.py "Which FLORT variable should I use for backscatter?"
+python client/ask.py -v "How do I read QARTOD flags?"     # -v: show pages fetched + tokens
+```
+
+Settings (environment variables; defaults in brackets):
+
+| Variable | Meaning | Default |
+|---|---|---|
+| `USERGUIDE_AWS_PROFILE` | AWS CLI profile | `securecomputing` |
+| `USERGUIDE_AWS_REGION` | Bedrock region | `us-west-2` |
+| `USERGUIDE_MODEL_ID` | model / inference profile | `us.anthropic.claude-sonnet-4-6` |
+| `USERGUIDE_BASE_URL` | corpus root | `https://robfatland.github.io/prototype-userguide/` |
+
+Cost: a typical question uses ~5–10k input tokens and ~1k output — a few cents with Sonnet.
+To test unpublished corpus edits, serve `docs/` locally (`python -m http.server -d docs 8000`) and
+set `USERGUIDE_BASE_URL=http://localhost:8000/`.
+
+
 ## What problem does this solve — and what does the FM do?
 
 Existing observatory documentation has two problems: it is **labyrinthine** (hard to find your way
