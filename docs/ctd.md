@@ -157,6 +157,9 @@ zone below — not a sensor fault.
 
 ## Shallow profiler specifics
 
+*Background: [Shallow profiler operations](shallow-profiler.md) (profiles, daily index, profile
+index / GPI, redux).*
+
 - **[HIGH]** The delivered stream is **continuous**: it includes time parked at the ~200 m
   platform between profiles (48% of samples are below 150 m in the example file). Split it into
   up-casts with the RCA **profile index** (start / peak / end of every profile):

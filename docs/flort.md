@@ -164,6 +164,9 @@ This affects `b_bp` at the few-percent level. Ask OOI which was applied.
 
 ## Shallow profiler specifics
 
+*Background: [Shallow profiler operations](shallow-profiler.md) (profiles, daily index, profile
+index / GPI, redux).*
+
 - **[HIGH]** The delivered stream is **continuous**: it includes time parked at the ~200 m platform between
   profiles, not just profiles. In the example file about half the samples are below 150 m.
 - To split the stream into individual up-casts, use the RCA **profile index** (start / peak / end

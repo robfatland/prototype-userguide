@@ -7,6 +7,7 @@
 
 ## Guides
 
+- [Shallow profiler operations](https://robfatland.github.io/prototype-userguide/shallow-profiler.md): READ FIRST for any shallow-profiler question. The platform and its three sites (designators, coordinates); a profile's ascent/descent/rest phases and durations; the daily index (1-9, UTC day) and which sensors run on which profiles (nitrate, pH, pCO2 only on #4 and #9); the profile index and GPI (global profile index): what it is, where to get it, code to cut a delivered stream into profiles; the "redux" one-file-per-profile-per-sensor convention and its filename; UTC time.
 - [Data access](https://robfatland.github.io/prototype-userguide/data-access.md): The routes to OOI data (Data Explorer, OOINET, ERDDAP, THREDDS, cloud object storage, Zenodo) and which to use for what. (planned)
 - [Quality-control flags](https://robfatland.github.io/prototype-userguide/qc-flags.md): How to read QARTOD and automated QC flag variables in delivered files, and which values mean "do not use". (planned)
 - [Currents](https://robfatland.github.io/prototype-userguide/currents.md): Where ocean current (velocity) data live — product codes, instruments (ADCP, point current meters), sites — and known processing resources. (planned)
