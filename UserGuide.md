@@ -204,8 +204,10 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
 
 **Build:**
 
-- [ ] Choose AWS account/profile for Bedrock; confirm model access + IAM with one test call.
-- [ ] `client/ask.py`; run the FLORT questions; record results.
+- [x] AWS profile `securecomputing` (account 084375582624), `us-west-2`, model
+      `us.anthropic.claude-sonnet-4-6` — test call OK; no IAM or console changes needed.
+- [x] `client/ask.py` written; first FLORT question run (see Results).
+- [ ] Run the remaining FLORT questions; record results.
 - [ ] Draft the v0 test bank (≈ 15 questions).
 - [ ] Remaining v0 pages: data access, QC flags, currents, two reference indexes.
 - [ ] `tools/zenodo_catalog.py` → `docs/datasets.md`.
@@ -219,4 +221,17 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
 
 ## Results
 
-*(none yet)*
+Format: question → pages fetched → tokens → verdict → corpus fixes made.
+
+**R1 (FLORT).** *"I downloaded a FLORT file from a shallow profiler. Which variable should I use
+for backscatter, and should I throw out samples whose qc_results show a failed test?"*
+
+- Fetched: `flort.md` only. Tokens: 7,186 in / 898 out (a few cents).
+- Verdict: **good.** Correct variable (`optical_backscatter`, L2) with the [HIGH] L1 warning and
+  the `b_bp` formula; correct "don't discard on stuck-value alone"; carried impact ratings;
+  cited page + primary sources; added relevant shallow-profiler caveats unprompted.
+- Errors: (1) FM stated a 0 bit in `qc_results` "means the test ran and failed" (should be
+  "failed or not run"). (2) Corpus weakness surfaced: the page attributed stuck-value failures to
+  quantization, which fits chlorophyll but not backscatter (~75 counts above dark, 99% failures).
+- Fixes: `flort.md` now separates chlorophyll (quantization) from backscatter (likely threshold),
+  and states the 0-bit = "failed or not run" rule explicitly.

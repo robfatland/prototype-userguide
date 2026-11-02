@@ -97,9 +97,13 @@ There are **two independent QC systems** in the file. Neither deletes data; you 
   local range did not).
 - **[HIGH] Most "failures" are the stuck-value test, and it is misleading here.** `qc_results = 13`
   (binary 01101 = stuck value failed) on **49% of chlorophyll** samples and **99% of backscatter**
-  samples. The stuck-value test flags repeated identical values — which is exactly what a
-  low-signal, quantized sensor produces (next section). OOI itself notes the stuck-value
-  thresholds "need to be reviewed". **Don't discard data on stuck-value alone.**
+  samples. The stuck-value test flags runs of repeated identical values. For **chlorophyll** that
+  is largely what a low-signal, quantized sensor produces (next section). For **backscatter** the
+  signal is ~75 counts above dark with ~2,000 distinct values, so quantization doesn't explain a
+  99% failure rate — the test's threshold is the likelier cause. OOI itself notes the stuck-value
+  thresholds "need to be reviewed". Either way: **don't discard data on stuck-value alone.**
+- Note that a 0 bit in `qc_results` means the test **failed or was not run** — always compare
+  with `qc_executed` (formula below) before treating a 0 as a failure.
 - Genuine-looking failures are rare: global range failed (`28`) on 35 chlorophyll samples; spike
   failed (`25`) on 30.
 
