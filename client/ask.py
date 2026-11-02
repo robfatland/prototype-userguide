@@ -36,7 +36,7 @@ MODEL_ID = os.environ.get("USERGUIDE_MODEL_ID", "us.anthropic.claude-sonnet-4-6"
 
 MAX_TOOL_ROUNDS = 6        # cap on fetch rounds per question
 MAX_PAGE_CHARS = 60_000    # truncate very long pages
-MAX_ANSWER_TOKENS = 2_000
+MAX_ANSWER_TOKENS = 4_000
 
 SYSTEM = [{"text": (
     "You answer questions about ocean-observatory (OOI) data for scientists, using ONLY the "
@@ -97,7 +97,11 @@ def ask(question, verbose=False):
         if resp["stopReason"] != "tool_use":
             if verbose:
                 print(f"[tokens: {tokens_in} in / {tokens_out} out]", file=sys.stderr)
-            return "".join(b.get("text", "") for b in out["content"])
+            answer = "".join(b.get("text", "") for b in out["content"])
+            if resp["stopReason"] == "max_tokens":
+                answer += ("\n\n[answer truncated at the output-token limit; ask a narrower "
+                           "question or raise MAX_ANSWER_TOKENS]")
+            return answer
 
         results = []
         for block in out["content"]:

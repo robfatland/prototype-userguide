@@ -11,10 +11,11 @@ source wins.
 
 Status (Nov 2026): **working demo.** Corpus live on GitHub Pages with three guide pages:
 `shallow-profiler.md` (operations, daily index, profile index / GPI, redux), `ctd.md` (CTD + DO),
-`nitrate.md`, `ph.md`, `pco2.md`, and `flort.md` — each grounded in real delivered files / verified data, with
+`nitrate.md`, `ph.md`, `pco2.md`, `par.md`, and `flort.md` — each grounded in real delivered files / verified data, with
 impact-rated caveats. Bedrock client (`client/ask.py`, Sonnet 4.6 via profile `securecomputing`)
-answers end-to-end; tests R1–R5 passed (R4: first multi-page synthesis), with every error fed back
-into the corpus or the client prompt. Also live: `ph.md`, `pco2.md`. v1 remaining: PAR. Remaining v0 pages (data access, QC flags, currents,
+answers end-to-end; tests R1–R6 passed (R4 and R6: multi-page syntheses), with every error fed
+back into the corpus or the client prompt. **v1 complete** (all shallow-profiler scalar sensors:
+CTD + DO, FLORT, nitrate, pH, pCO₂, PAR). Next: the v0 test bank (~15 questions). Remaining v0 pages (data access, QC flags, currents,
 reference indexes, Zenodo catalog) not yet written.
 
 
@@ -290,7 +291,10 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
 - [ ] Run the remaining FLORT questions; record results.
 - [x] v1 `ctd.md` (CTD + DO) written, grounded in a real file; R2 passed.
 - [x] v1 `nitrate.md` written (deployment-6 file); R4 cross-page test passed.
-- [ ] v1 `par.md`.
+- [x] v1 `par.md` written (Jan 2018 deployment-4 file); R6 passed. **v1 complete.**
+- [ ] Report to data team: PAR QARTOD applied to raw counts → fails 100% of samples
+      ([HIGH] for users who filter on it); calibrated `par_counts_output` has no QARTOD; nine
+      engineering variables + `par_measured` entirely fill (LOW).
 - [ ] Report to data team (LOW): nitrate instrument clock fields (`internal_timestamp`,
       `date_of_sample`) lag `time` by weeks–months from ~Oct 2018 in deployment 6.
 - [ ] Verify: SUNA accuracy/drift wording ("offsets of a few µmol L⁻¹") against the BGC Best
@@ -414,6 +418,21 @@ How do I get clean pH and pCO2 profiles, and can I compute the full carbonate sy
 - Fixes: both pages now inline the [HIGH] long-descent rule and explicitly contrast the pH vs pCO₂
   off-profile patterns. **Corpus lesson: never rely on the FM following a link for a [HIGH]
   rule — inline it where it applies.**
+
+**R6 (PAR + FLORT, light attenuation and chlorophyll).** *"I want to estimate light attenuation
+and euphotic depth from shallow profiler PAR at Slope Base and relate it to chlorophyll. Which
+data do I use, how should I filter it, and what are the traps?"*
+
+- Fetched: `par.md`, `flort.md`. Tokens: 11,744 in / 2,147 out.
+- Verdict: **very good — strongest synthesis yet.** Correct variables incl. the PAR name trap and
+  `b_bp`; ignore the PAR QARTOD flag; dark threshold before logs; daylight profiles by local solar
+  time (not daily index); Kd fit + euphotic depth with the surface-reach and in-profile timing
+  caveats; and the key cross-sensor insight — the daylight profiles needed for Kd are exactly
+  where chlorophyll is quenched, so compare with night profiles. Ratings copied correctly.
+- Errors: none factual. Client defect: the answer was cut off at the 2,000-token output limit
+  with no warning.
+- Fixes: `ask.py` output limit raised to 4,000 tokens, and a truncation notice is appended when
+  the model stops on `max_tokens`.
 
 
 
