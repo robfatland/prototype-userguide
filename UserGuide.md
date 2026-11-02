@@ -12,6 +12,24 @@ source wins.
 Status: **v0 in progress** — repo + Pages skeleton live; corpus pages and client not yet written.
 
 
+## What problem does this solve — and what does the FM do?
+
+Existing observatory documentation has two problems: it is **labyrinthine** (hard to find your way
+through) and **unhelpful as a user guide** (even when found, it doesn't tell a scientist which
+variable to use, what the QC flags mean, or what to distrust).
+
+- **`llms.txt` links to our own pages, not to program web pages.** Only the two *reference
+  index* pages are mostly link lists into external sites — those address the **labyrinth**
+  problem.
+- **The guide pages are where the missing user-guide content gets written** — which variable is
+  the science variable, what the flags mean, what to distrust, how to get the data. That addresses
+  the **unhelpful** problem, and **we solve it by writing that content, not the FM.**
+- **The FM's job is narrower:** find the right page(s) and answer from them, with citations.
+- **If a guide page is thin, the FM will fill gaps with general knowledge or guesses.** Catching
+  that is exactly what the test bank is for: every wrong or unsupported answer points to a page
+  that needs writing or fixing.
+
+
 ## How it works (plain words)
 
 - **The corpus is a small set of text files on a public web site.** One of them, `llms.txt`, is a
