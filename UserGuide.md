@@ -285,7 +285,7 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
 - [ ] Run the remaining FLORT questions; record results.
 - [x] v1 `ctd.md` (CTD + DO) written, grounded in a real file; R2 passed.
 - [x] v1 `nitrate.md` written (deployment-6 file); R4 cross-page test passed.
-- [ ] v1 `ph.md`, `pco2.md`, `par.md`.
+- [ ] v1 `par.md`.
 - [ ] Report to data team (LOW): nitrate instrument clock fields (`internal_timestamp`,
       `date_of_sample`) lag `time` by weeks–months from ~Oct 2018 in deployment 6.
 - [ ] Verify: SUNA accuracy/drift wording ("offsets of a few µmol L⁻¹") against the BGC Best
@@ -294,10 +294,16 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
 - [x] `shallow-profiler.md` written (platform, phases + verified durations, daily index in the
       UTC day, profile index / GPI + slicing code, redux convention, UTC); R3 passed.
 - [ ] Re-run R2/R3 with the new system prompt to confirm rating drift is gone.
-- [ ] argosy fixes found while writing: `plume/ColumbiaPlumePlan.md` gives oo latitude 44.66
-      (code uses 44.374); `SensorTable.md` calls PCO2W a Pro-Oceanus CO2-Pro (files say SAMI) —
-      verify at the pCO₂ page; `Sharding.md` says daily index 8 has an extended descent (2024
-      index shows only #4 and #9 do).
+- [x] argosy `SensorTable.md`: PCO2W corrected to Sunburst SAMI-CO2 (verified from the delivered
+      variables: 434/620 nm absorbances + blanks).
+- [ ] argosy fixes still open: `plume/ColumbiaPlumePlan.md` gives oo latitude 44.66 (code uses
+      44.374); `Sharding.md` says daily index 8 has an extended descent (2024 index shows only #4
+      and #9 do).
+- [x] v1 `ph.md`, `pco2.md` written (deployment-6 files; sampling verified per sample).
+- [ ] Verify: pH scale and reference temperature of PHWATER_L2 (from the pH DPS); the "pH + pCO₂
+      is a poor pair for TA/DIC" statement (cite a carbonate-system error-propagation source).
+- [ ] Report to data team (LOW): pH `phsen_thermistor_temperature` labeled V but holds °C;
+      `internal_timestamp` zero in pH and pCO₂ files.
 - [ ] Process rule: never batch a page write and its `git commit`; verify the page is tracked and
       served (HTTP 200) before adding it to `llms.txt`.
 - [ ] Draft the v0 test bank (≈ 15 questions).
