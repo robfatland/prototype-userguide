@@ -9,7 +9,11 @@ Amazon Bedrock, answers practical data questions well using only that corpus.
 page links to its primary sources; where this guide and an official source disagree, the official
 source wins.
 
-Status: **v0 in progress** — repo + Pages skeleton live; corpus pages and client not yet written.
+Status (Nov 2026): **working demo.** Corpus live on GitHub Pages; FLORT guide written (grounded in
+a real delivered file, impact-rated caveats); Bedrock client (`client/ask.py`, Sonnet 4.6 via
+profile `securecomputing`) answers end-to-end; first test (R1) passed with fixes fed back into the
+corpus. Remaining v0 pages (data access, QC flags, currents, reference indexes, Zenodo catalog)
+not yet written. Proposed v1: CTD + DO, pCO₂, pH, nitrate, PAR (see "Scope and phasing").
 
 
 ## What problem does this solve — and what does the FM do?
@@ -30,7 +34,7 @@ variable to use, what the QC flags mean, or what to distrust).
   that needs writing or fixing.
 
 
-## How it works (plain words)
+## How it works
 
 - **The corpus is a small set of text files on a public web site.** One of them, `llms.txt`, is a
   table of contents: a short intro, then a list of links, each with one line saying what that page
@@ -74,6 +78,13 @@ variable to use, what the QC flags mean, or what to distrust).
   2. Interactive Oceans (instrument pages, Data Portal).
   3. The Zenodo `nsf-ooi` community (25+ records).
   Also: BGC Best Practices & User Guide, `ooi-data-explorations`, the program's Discourse forum.
+  4. **Hands-on project experience: the `argosy` repo**
+     ([robfatland/argosy](https://github.com/robfatland/argosy)) — years of working with
+     shallow-profiler data: sensor sampling modes, QC findings, exclusion windows, filtering
+     choices. Used as a source of *practical* knowledge the official docs lack, labeled as
+     project experience (not official) and linked.
+  5. **Real delivered files** (OOINET source NetCDF): each instrument guide is grounded in one
+     inspected file — variable inventory, flag counts, calibration fields, signal levels.
 
 
 ## Corpus structure (`docs/`)
@@ -106,17 +117,27 @@ The goal is a scientist's user guide. The client is generic and doesn't change; 
 the corpus. So phases are defined by corpus coverage, each with a test bank of questions.
 
 - **v0:** data access routes; QARTOD / QC flags; currents (velocity products, ADCP); the
-  3-wavelength fluorometer (FLORT); the Zenodo catalog. Test bank ≈ 15 questions, including the
-  three that motivated this:
+  3-wavelength fluorometer (FLORT, **done**); the Zenodo catalog. Test bank ≈ 15 questions,
+  including the three that motivated this:
   - "What current data exist, and at which sites?"
   - "Is there code that takes downloaded velocity data from a shallow profiler to currents?"
   - "How do I interpret a delivered FLORT dataset — which variables, which QC flags, what to
     distrust?"
-- **Later:** one instrument guide at a time (CTD, dissolved oxygen, pH, pCO₂, nitrate, PAR, …),
-  each adding test questions. Each new guide page also documents a concrete gap.
+- **v1 (PROPOSED — awaiting go-ahead):** the rest of the shallow-profiler sensor suite, one guide
+  page each, same recipe as FLORT (inspect one real delivered Slope Base file + DPS/ION + argosy
+  experience; impact-rate every caveat; 3–4 test questions per page):
+  1. `ctd.md` — CTD incl. dissolved oxygen (foundation: depth, T, S, density, DO feed every other
+     sensor's corrections). Source file ~480 MB.
+  2. `nitrate.md` — SUNA nitrate. Source file ~50 MB.
+  3. `ph.md` — pH (SAMI). Source file ~2 MB.
+  4. `pco2.md` — pCO₂ (SAMI), incl. its separate calibration-record stream. Source file ~2 MB.
+  5. `par.md` — PAR. Source file ~560 MB.
+- **Later:** remaining v0 pages, other platforms (moorings, gliders), other instrument classes.
+  Each new guide page also documents a concrete gap.
 
 
 ## Client (`client/ask.py`) — design sketch
+
 
 ```python
 import boto3, urllib.request
@@ -221,6 +242,8 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
 
 ## Results
 
+### FLORT backscatter query
+
 Format: question → pages fetched → tokens → verdict → corpus fixes made.
 
 **R1 (FLORT).** *"I downloaded a FLORT file from a shallow profiler. Which variable should I use
@@ -235,3 +258,61 @@ for backscatter, and should I throw out samples whose qc_results show a failed t
   quantization, which fits chlorophyll but not backscatter (~75 counts above dark, 99% failures).
 - Fixes: `flort.md` now separates chlorophyll (quantization) from backscatter (likely threshold),
   and states the 0-bit = "failed or not run" rule explicitly.
+
+
+
+### FLORT Chlor-a query
+
+
+`(environ-name) username$ python client/ask.py -v "from an ooinet flort data product that I downloaded: what data variable should I use for scientific interpretation from the triplet fluorometer chlorophyll-a? And what should I expect concerning the nature of the data?"`
+
+
+fetch_doc = `https://robfatland.github.io/prototype-userguide/flort.md`
+
+
+[tokens: 7312 in / 993 out]
+
+
+#### Variable to use for chlorophyll-a
+
+
+Use **`fluorometric_chlorophyll_a`** (product code **CHLAFLO_L1**, units µg L⁻¹). This is the science-ready L1 variable. Do **not** use the raw count variable `raw_signal_chl` (L0), and do **not** confuse it with the backscatter intermediates.
+
+
+---
+
+
+#### What to expect — key caveats (in priority order)
+
+
+##### [HIGH] It is a fluorescence *estimate*, not a direct chlorophyll measurement — and it runs ~2× high
+Factory-calibrated ECO Triplet (FLORT) chlorophyll fluorescence overestimates extracted chlorophyll by roughly **a factor of 2 on average** globally (Roesler et al. 2017, *L&O Methods*, doi:10.1002/lom3.10185). This matters for absolute values; relative spatial/temporal patterns are still useful.
+
+##### [HIGH] Daytime near-surface values read *low* due to non-photochemical quenching (NPQ)
+In bright near-surface light, phytoplankton suppress fluorescence. Daytime near-surface chlorophyll is systematically underestimated. Compare night profiles or apply an NPQ correction.
+
+##### [HIGH] Low signal → coarse quantization steps
+Raw output is integer counts; one count = **0.0115 µg L⁻¹** per step. In the deep or in clear water the signal is only a handful of counts above dark (median ~6 counts above dark in the example file; below ~100 m the signal is essentially dark + noise). Small **negative values** (e.g. −0.046 µg L⁻¹) are dark-count noise, not real chlorophyll. **Smooth or bin the data** (e.g. Savitzky–Golay filter or depth bins) before interpreting fine structure.
+
+##### [HIGH for long deployments] Biofouling drift
+Profiler and moored instruments without a wiper accumulate biofouling over a deployment, causing a slow upward drift in signal. Compare early vs. late deployment periods and use the `deployment` variable when stitching files.
+
+##### [HIGH] Stuck-value QC failures are misleading — don't discard on that basis alone
+The OOI automated QC `*_qc_results` bit-mask flags ~49% of chlorophyll samples as "stuck-value failures." This is largely an artifact of the low-signal quantization (repeated identical integer count values), not genuinely bad data. Use `qc_executed` alongside `qc_results` to distinguish tests that ran-and-failed from tests that simply didn't run.
+
+---
+
+#### Quick practical checklist
+
+| Step | Action |
+|---|---|
+| Variable | `fluorometric_chlorophyll_a` |
+| Absolute calibration | Expect ~2× overestimate vs. extracted Chl; apply Roesler et al. 2017 if needed |
+| NPQ | Exclude or correct daytime near-surface data |
+| Low signal / quantization | Bin or smooth; treat negatives as zero |
+| QC flags | QARTOD summary flag 4 = probably bad; flag 3 = "look closer". Ignore stuck-value-only failures |
+| Biofouling | Compare early vs. late deployment |
+
+---
+
+**Source:** [FLORT page, prototype-userguide](https://robfatland.github.io/prototype-userguide/flort.md), citing OOI DPS 1341-00530 (CHLAFLO), Roesler et al. 2017 (*L&O Methods*), ION FLO processing functions, and the OOI Biogeochemical Sensor Data Best Practices & User Guide v1.1.1.
