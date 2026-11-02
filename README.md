@@ -1,0 +1,21 @@
+# prototype-userguide
+
+A self-funded prototype of the lightest-lift way to give scientists an AI-usable **user guide**
+for ocean-observatory data: a curated, AI-readable corpus (`llms.txt` + plain markdown pages)
+published on GitHub Pages, plus a small client that lets a foundation model (via Amazon Bedrock)
+answer questions from it.
+
+**Unofficial.** Not affiliated with, endorsed by, or funded by any observatory program. Pages link
+to their primary sources; official sources take precedence.
+
+- Corpus (live): https://robfatland.github.io/prototype-userguide/llms.txt
+- Use it with any AI: *"Use https://robfatland.github.io/prototype-userguide/llms.txt to answer my
+  questions about ocean-observatory data."*
+
+## Layout
+
+- `UserGuide.md` — design: how it works, decisions, corpus structure, phasing, client sketch,
+  prerequisites, build steps, results.
+- `docs/` — the published corpus (GitHub Pages source). `docs/llms.txt` is the index.
+- `client/` — *(planned)* `ask.py`, the Bedrock client.
+- `tools/` — *(planned)* `zenodo_catalog.py`, generates `docs/datasets.md`.

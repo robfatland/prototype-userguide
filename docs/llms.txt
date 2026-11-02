@@ -1,0 +1,22 @@
+# prototype-userguide
+
+> An unofficial, practical user guide for scientists using NSF Ocean Observatories Initiative
+> (OOI) data: what the data products are, how to get them, what is in a delivered file, how to read
+> the quality-control flags, and what to distrust. Each page cites its primary sources; official
+> sources take precedence. Status: v0 skeleton — pages below are planned and not yet written.
+
+## Guides
+
+- [Data access](https://robfatland.github.io/prototype-userguide/data-access.md): The routes to OOI data (Data Explorer, OOINET, ERDDAP, THREDDS, cloud object storage, Zenodo) and which to use for what. (planned)
+- [Quality-control flags](https://robfatland.github.io/prototype-userguide/qc-flags.md): How to read QARTOD and automated QC flag variables in delivered files, and which values mean "do not use". (planned)
+- [Currents](https://robfatland.github.io/prototype-userguide/currents.md): Where ocean current (velocity) data live — product codes, instruments (ADCP, point current meters), sites — and known processing resources. (planned)
+- [3-wavelength fluorometer (FLORT)](https://robfatland.github.io/prototype-userguide/flort.md): What a delivered FLORT file contains (science, raw counts, calibration, QC, engineering variables), CDOM vs FDOM, biofouling, and low-signal caveats. (planned)
+
+## Reference
+
+- [Program website index](https://robfatland.github.io/prototype-userguide/ref-program-site.md): Annotated links into the observatory program website: data product pages, instrument pages, data product specifications, knowledge base. (planned)
+- [Interactive Oceans index](https://robfatland.github.io/prototype-userguide/ref-interactive-oceans.md): Annotated links into the Regional Cabled Array site: instrument pages and the Data Portal. (planned)
+
+## Datasets
+
+- [Zenodo nsf-ooi catalog](https://robfatland.github.io/prototype-userguide/datasets.md): Community-published OOI-derived datasets and software on Zenodo, with size, whether code and documentation are included, and DOIs. Generated from the Zenodo API. (planned)
