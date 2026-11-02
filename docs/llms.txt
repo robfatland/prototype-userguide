@@ -10,7 +10,7 @@
 - [Data access](https://robfatland.github.io/prototype-userguide/data-access.md): The routes to OOI data (Data Explorer, OOINET, ERDDAP, THREDDS, cloud object storage, Zenodo) and which to use for what. (planned)
 - [Quality-control flags](https://robfatland.github.io/prototype-userguide/qc-flags.md): How to read QARTOD and automated QC flag variables in delivered files, and which values mean "do not use". (planned)
 - [Currents](https://robfatland.github.io/prototype-userguide/currents.md): Where ocean current (velocity) data live — product codes, instruments (ADCP, point current meters), sites — and known processing resources. (planned)
-- [3-wavelength fluorometer (FLORT)](https://robfatland.github.io/prototype-userguide/flort.md): What a delivered FLORT file contains (science, raw counts, calibration, QC, engineering variables), CDOM vs FDOM, biofouling, and low-signal caveats. (planned)
+- [3-wavelength fluorometer (FLORT)](https://robfatland.github.io/prototype-userguide/flort.md): Which variable to use for chlorophyll, CDOM, and backscatter (L1 vs L2, particulate b_bp); what all 48 variables in a delivered file are; how to read QARTOD and OOI QC bit-mask flags (and why stuck-value "failures" mislead); what to distrust: low-signal quantization, the ~2x chlorophyll calibration bias, daytime quenching, CDOM vs FDOM, biofouling, empty calibration fields; shallow-profiler stream specifics.
 
 ## Reference
 

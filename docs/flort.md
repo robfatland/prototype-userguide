@@ -3,6 +3,13 @@
 *Unofficial. Part of [prototype-userguide](llms.txt). Every claim cites a source; official sources
 take precedence. Worked examples come from one real delivered file (below) — check your own file.*
 
+**Impact ratings.** Not every issue matters equally. Each caveat below is tagged:
+
+- **[HIGH]** — will mislead your analysis if ignored.
+- **[MEDIUM]** — matters for some analyses; know it exists.
+- **[LOW]** — a system or documentation defect worth **reporting to the data team**, but it does
+  not stop you: the delivered L1/L2 products are usable as they are.
+
 
 ## What the instrument is
 
@@ -27,10 +34,10 @@ take precedence. Worked examples come from one real delivered file (below) — c
 | CDOM (fluorescence) | `fluorometric_cdom` | CDOMFLO_L1 | ppb |
 | Backscatter (for particles / turbidity) | `optical_backscatter` | **FLUBSCT_L2** | m⁻¹ |
 
-- **Backscatter trap:** `total_volume_scattering_coefficient` (FLUBSCT_**L1**, m⁻¹ sr⁻¹) is the
+- **[HIGH] Backscatter trap:** `total_volume_scattering_coefficient` (FLUBSCT_**L1**, m⁻¹ sr⁻¹) is the
   raw *angular* scattering at one angle. It is **not** the backscatter coefficient. For analysis
   use `optical_backscatter` (L2). [ION FLO functions](https://cwingard.github.io/ion-functions/api/flo_functions/)
-- **`optical_backscatter` is total backscatter** (particles + seawater):
+- **[MEDIUM] `optical_backscatter` is total backscatter** (particles + seawater):
   `b_b = b_bp + b_sw/2`. For **particulate** backscatter (what most particle studies want):
   `b_bp = optical_backscatter − seawater_scattering_coefficient / 2`.
   [DPS 1341-00540](https://oceanobservatories.org/wp-content/uploads/2023/09/1341-00540_Data_Product_SPEC_FLUBSCT_OOI.pdf)
@@ -75,7 +82,7 @@ There are **two independent QC systems** in the file. Neither deletes data; you 
 - `*_qartod_executed` is a string, one digit per test, in the order of its `tests_executed`
   attribute — here `gross_range_test, climatology_test`. Example: `"13"` = gross range **pass**,
   climatology **suspect**.
-- **"Suspect" is not "bad".** In the example file, the climatology test marked **57% of CDOM**
+- **[MEDIUM] "Suspect" is not "bad".** In the example file, the climatology test marked **57% of CDOM**
   samples suspect (1,245,226 of 2,180,976). Treat 3 as "look closer", 4 as "probably bad".
 
 **2. OOI automated QC — `*_qc_executed` and `*_qc_results` (bit masks).**
@@ -88,7 +95,7 @@ There are **two independent QC systems** in the file. Neither deletes data; you 
   `effective` is a test that ran and failed. (Same source.)
 - Example file: `qc_executed = 29` (binary 11101 → global range, spike, trend, stuck value ran;
   local range did not).
-- **Most "failures" are the stuck-value test, and it is misleading here.** `qc_results = 13`
+- **[HIGH] Most "failures" are the stuck-value test, and it is misleading here.** `qc_results = 13`
   (binary 01101 = stuck value failed) on **49% of chlorophyll** samples and **99% of backscatter**
   samples. The stuck-value test flags repeated identical values — which is exactly what a
   low-signal, quantized sensor produces (next section). OOI itself notes the stuck-value
@@ -99,7 +106,7 @@ There are **two independent QC systems** in the file. Neither deletes data; you 
 
 ## What to distrust (and why)
 
-**Low signal → coarse steps (quantization).** Raw output is integer counts, so values come in
+**[HIGH] Low signal → coarse steps (quantization).** Raw output is integer counts, so values come in
 fixed steps of one `scale_factor`. In clear or deep water the signal is only a few counts above
 dark, so the steps dominate. In the example file (recovered by fitting L1 against raw counts):
 
@@ -117,34 +124,35 @@ dark, so the steps dominate. In the example file (recovered by fitting L1 agains
 
 **Chlorophyll from fluorescence is an estimate, not a measurement of chlorophyll.**
 
-- Factory-calibrated ECO chlorophyll overestimates extracted chlorophyll by about a **factor of 2**
-  on average (global analysis). [Roesler et al. 2017, L&O Methods](https://doi.org/10.1002/lom3.10185)
-- **Daytime quenching:** in bright near-surface light, phytoplankton suppress fluorescence
+- **[HIGH for absolute chlorophyll; LOW for relative patterns]** Factory-calibrated ECO chlorophyll
+  overestimates extracted chlorophyll by about a **factor of 2** on average (global analysis). [Roesler et al. 2017, L&O Methods](https://doi.org/10.1002/lom3.10185)
+- **[HIGH near the surface in daylight] Daytime quenching:** in bright near-surface light, phytoplankton suppress fluorescence
   (non-photochemical quenching), so daytime surface chlorophyll reads low. Compare night profiles,
   or correct. See the BGC Best Practices guide below.
 
-**"CDOM" is really fluorescent DOM (FDOM).** The sensor measures fluorescence (excite 370 nm /
+**[MEDIUM] "CDOM" is really fluorescent DOM (FDOM).** The sensor measures fluorescence (excite 370 nm /
 emit 460 nm), which tracks only the fluorescent fraction of colored dissolved organic matter. The
 file calls it "CDOM Concentration" in ppb (relative to the factory calibration standard); treat it
 as a relative fluorescence index, not a CDOM concentration.
 [DPS 1341-00550](https://oceanobservatories.org/wp-content/uploads/2023/09/1341-00550_Data_Product_Specification_CDOMFLO_OOI.pdf);
 [BGC Best Practices guide](https://oceanobservatories.org/wp-content/uploads/2025/07/OOI-Biogeochemical-Sensor-Data-Best-Practices-and-User-Guide-Version-1.1.1-with-July-dated-GOOS-Endorsement-Certificate-on-p2-Updated-DOI.pdf)
 
-**Backscatter spikes are real particles, not noise.** Large particles (marine snow, zooplankton)
+**[MEDIUM] Backscatter spikes are real particles, not noise.** Large particles (marine snow, zooplankton)
 crossing the beam make positive spikes. For the background particle field, take a running
 minimum (Briggs et al. 2011, doi:10.1016/j.dsr.2011.09.007); for aggregates, study the spikes.
 
-**Biofouling drift.** Profiler units have no wiper, so fouling can build over a deployment
+**[HIGH for long time series] Biofouling drift.** Profiler units have no wiper, so fouling can build over a deployment
 (signals creeping up, or a drift in the deep "dark" value). Compare early vs late in a
 deployment; check the `deployment` number when stitching files.
 
-**Calibration fields in the file may be empty.** In the example file, every
-`signal_*_offset` and `signal_*_scale_factor` value is **0** — you cannot rebuild L1 from raw
-counts using the file alone. Use the L1/L2 values as delivered, or look up the instrument's
+**[LOW — report to data team] Calibration fields in the file may be empty.** In the example
+file, every `signal_*_offset` and `signal_*_scale_factor` value is **0** — you cannot rebuild L1
+from raw counts using the file alone. Low impact for most users: the system delivers L1, and
+analysis starts from L1 (or transforms it to L2 and beyond). Use the L1/L2 values as delivered, or look up the instrument's
 calibration in OOI's asset-management records
 ([oceanobservatories/asset-management](https://github.com/oceanobservatories/asset-management)).
 
-**Backscatter angle: a documentation mismatch.** The file's comment says the default scattering
+**[LOW — report to data team] Backscatter angle: a documentation mismatch.** The file's comment says the default scattering
 angle is **117°**; the processing documentation lists **124°** (χ = 1.076) for FLORT-D units.
 This affects `b_bp` at the few-percent level. Ask OOI which was applied.
 [ION FLO functions](https://cwingard.github.io/ion-functions/api/flo_functions/)
@@ -152,7 +160,7 @@ This affects `b_bp` at the few-percent level. Ask OOI which was applied.
 
 ## Shallow profiler specifics
 
-- The delivered stream is **continuous**: it includes time parked at the ~200 m platform between
+- **[HIGH]** The delivered stream is **continuous**: it includes time parked at the ~200 m platform between
   profiles, not just profiles. In the example file about half the samples are below 150 m.
 - To split the stream into individual up-casts, use the RCA **profile index** (start / peak / end
   time of every profile): [OOI-CabledArray/profileIndices](https://github.com/OOI-CabledArray/profileIndices).
