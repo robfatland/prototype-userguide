@@ -123,7 +123,9 @@ def main():
     ap.add_argument("--verbose", "-v", action="store_true",
                     help="show fetched pages and token usage (on stderr)")
     args = ap.parse_args()
-    print(ask(" ".join(args.question), verbose=args.verbose))
+    answer = ask(" ".join(args.question), verbose=args.verbose)
+    print()              # blank line: visual gap between the command line and the response
+    print(answer)
 
 
 if __name__ == "__main__":
