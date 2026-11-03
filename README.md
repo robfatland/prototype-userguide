@@ -17,6 +17,8 @@ to their primary sources; official sources take precedence.
 - `UserGuide.md` — design: how it works, decisions, corpus structure, phasing, client sketch,
   prerequisites, build steps, results.
 - `docs/` — the published corpus (GitHub Pages source). `docs/llms.txt` is the index.
+- `PublicClient.md` — design for a browser-accessible, invite-only (token) version of the client,
+  with per-day budget caps and a cost estimate. Not built.
 - `client/ask.py` — the Bedrock client. Needs `boto3` and AWS credentials with Bedrock access:
   `python client/ask.py -v "Which FLORT variable should I use for backscatter?"`
   (defaults: profile `securecomputing`, region `us-west-2`, model

@@ -262,6 +262,14 @@ write it or drop the entry so nothing in the index points at a missing page.
 - [x] Run the full test bank (T1–T18): all pass; no corpus fixes needed from the final batch.
 - [ ] Remove or write `currents.md` — `llms.txt` lists it but it 404s (surfaced by T17).
 - [ ] Remaining general pages: data access, QC flags, currents; the two reference indexes.
+- [ ] **Next instrument data = the ADCP(s) on the shallow profiler platform** (the scalar/HSD+LSD
+      sensor suite is now fully covered — end of the available scalar plethora). The ADCPs are
+      *vector* instruments (velocity profiles), not yet sharded by argosy, so this needs new
+      inspection work before a `currents.md` can be grounded in a real file. Verify how many ADCPs
+      (one or two) and their orientation/range. Ties to the currents page and the argosy VectorData
+      effort.
+- [ ] **Public browser client (invite-only):** design in `PublicClient.md`. Lambda + token
+      allow-list + daily budget cap. Build is ~1–2 days when wanted.
 - [ ] `tools/zenodo_catalog.py` → `docs/datasets.md`.
 - [ ] Delete the ~1.5 GB of downloaded source files under `~/ooi/sb/ooinet/scalar/2018_*` once no
       longer needed (kept for now for second-file spot-checks).
