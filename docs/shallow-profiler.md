@@ -40,11 +40,20 @@ Base profile index, medians):
 | Descent (`peak` → `end`) | **34 min** — or **95 min** on profiles #4 and #9 | ~10 cm s⁻¹; #4 and #9 stop at set depths |
 | Rest (until next `start`) | ~30–70 min | parked at the ~200 m platform |
 
-- **[MEDIUM] Use the ascent for science.** The sensors sit at the top of the pod, so on the way
-  up they meet undisturbed water; on the way down the pod falls through water it has just
-  stirred. Descent data are noisier and treated as second-class (still useful for checking
-  stability between the two passes). *(argosy, `DescentData.md`)*
-- **Exception:** pH and pCO₂ measure **on descent** by design (see daily index).
+- **[HIGH] Why ascent is the high-quality direction.** The sensor package sits at the **top** of
+  the science pod, which rises **from ~200 m toward the surface**. On ascent the sensors lead the
+  pod into water the pod has **not yet touched** — an undisturbed water mass entered from below —
+  so the sample is clean. On descent the pod falls through water it has just stirred with its own
+  wake, so those data are noisier. For the eight continuously-sampled sensors, **use the ascent**;
+  descent is treated as second-class (still useful as a qualitative check on how much the
+  structure changed between the two passes). *(argosy, `DescentData.md`)*
+- **[HIGH] But descent is not second-class for everyone — it is the *primary* measurement for the
+  carbonate sensors.** The counterpoint to "ascent is better": pH and pCO₂ **only** produce profile
+  data on descent, at the stop-and-go stops of profiles #4 and #9 (see the duty-cycle table
+  below). For those sensors the descent *is* the dataset; there is no ascent profile to prefer.
+  Nitrate is the mixed case — it is a #4/#9 sensor like pH and pCO₂, but measures on **ascent**.
+  So the rule is per-sensor: ascent for the eight continuous sensors and for nitrate; **descent
+  for pH and pCO₂.** *(argosy, `SensorTable.md`)*
 
 
 ## The daily index (1–9) and which sensors run when
@@ -73,7 +82,8 @@ Base profile index, medians):
 
 ## The profile index (and "GPI")
 
-- **What it is:** a public table, maintained by the RCA data team, of **every profile** each
+- **What it is:** a public table, maintained by the OOI Regional Cabled Array data team
+  (**Joe Duprey** and **Wendi Ruef**, University of Washington), of **every profile** each
   profiler has made: a running **profile number** plus three UTC times — `start` (ascent begins),
   `peak` (shallowest point: ascent ends, descent begins), `end` (descent ends).
   [OOI-CabledArray/profileIndices](https://github.com/OOI-CabledArray/profileIndices)
