@@ -230,6 +230,20 @@ euphotic depth with caveats; and the cross-sensor insight that the daylight prof
 are where chlorophyll is quenched. Ratings correct. **Error:** answer truncated at the 2,000-token
 output limit. **Fix:** `ask.py` limit raised to 4,000 with a truncation notice.
 
+**R7 (data-access, resolution trap + ordering).** *"I pulled shallow profiler CTD data through
+Data Explorer for a mixed layer study and the profiles look weirdly smooth. Also, how do I get
+the raw full-resolution data?"* Fetched `data-access.md`, `ctd.md`; 10,972 / 1,181 tokens.
+**Good:** diagnosed the [HIGH] 1-minute-binning resolution trap (≈3 m vertical bins smear the
+MLD structure); routed to OOINET order / Gold Copy for full resolution; added the in-situ-density
+MLD pitfall and the σ₀ recipe unprompted; correct variables and citations. No corpus fix.
+
+**R8 (ascent vs descent counterpoint).** *"Is descent data useless? Which sensors actually use
+it?"* Fetched `shallow-profiler.md`, `ph.md`, `pco2.md`, `nitrate.md`; 16,211 / 1,095 tokens.
+**Good:** ascent for the 8 continuous sensors (sensors on top of the pod enter undisturbed water
+from below); **descent is the primary data for pH and pCO₂** (`peak → end`); nitrate the mixed
+case (#4/#9 but ascent); clean per-sensor summary table; the off-profile ~190 m caveat. No corpus
+fix.
+
 **Batch run of the remaining tests (T2, T3, T6, T7, T9, T11, T13, T15, T16, T17, T18).** All
 **passed** — every must-include fact present, ratings copied correctly, no invented URLs, no
 rating drift. Highlights and notes:
@@ -261,7 +275,10 @@ write it or drop the entry so nothing in the index points at a missing page.
 **Build / corpus:**
 - [x] Run the full test bank (T1–T18): all pass; no corpus fixes needed from the final batch.
 - [ ] Remove or write `currents.md` — `llms.txt` lists it but it 404s (surfaced by T17).
-- [ ] Remaining general pages: data access, QC flags, currents; the two reference indexes.
+- [x] `data-access.md` written (ordering from OOINET; access routes; the [HIGH] 1-minute
+      resolution trap for SP data); R7 passed. shallow-profiler.md gained the ascent-from-below
+      rationale + descent counterpoint (R8 passed) and names Duprey & Ruef.
+- [ ] Remaining general pages: QC flags, currents; the two reference indexes.
 - [ ] **Next instrument data = the ADCP(s) on the shallow profiler platform** (the scalar/HSD+LSD
       sensor suite is now fully covered — end of the available scalar plethora). The ADCPs are
       *vector* instruments (velocity profiles), not yet sharded by argosy, so this needs new
