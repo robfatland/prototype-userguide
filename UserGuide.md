@@ -323,7 +323,10 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
 ## Open questions
 
 - Which FM (and whether to compare two).
-- The full v0 test bank (≈ 15 questions).
+- The v0 test bank: draft T1–T18 is above — Rob to edit/add the questions scientists actually
+  get stuck on.
+- Cost: ~$0.04–0.08 per query at the US-profile rate (third-party listed $3.30 / $16.50 per M
+  input / output tokens; confirm in billing). Prompt caching or the `global.` profile would cut it.
 
 
 ## Results
