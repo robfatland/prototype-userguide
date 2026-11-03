@@ -13,9 +13,10 @@ source wins.
 `shallow-profiler.md` (operations: daily index, profile index / GPI, redux), `ctd.md` (CTD + DO),
 `nitrate.md`, `ph.md`, `pco2.md`, `par.md`, `flort.md` — each grounded in a real delivered file,
 with impact-rated caveats. The Bedrock client (`client/ask.py`, Sonnet 4.6) answers end to end;
-test bank tests T1, T5, T8, T10, T12, T14 run and passed (see Results), each error fed back into
-the corpus or the client prompt. All shallow-profiler scalar sensors are now covered. Not yet
-written: data-access, QC-flags, and currents pages; the two reference indexes; the Zenodo catalog.
+the **full test bank (T1–T18) passes** — all 16 in-scope questions and both out-of-scope checks
+(see Results), each error found along the way fed back into the corpus or the client prompt. All
+shallow-profiler scalar sensors are now covered. Not yet written: data-access, QC-flags, and
+currents pages; the two reference indexes; the Zenodo catalog.
 
 
 ## How it works
@@ -152,23 +153,23 @@ the corpus doesn't cover it, without guessing. T1–T16 cover all seven pages; s
 | # | Question | Pages | Must include | Run |
 |---|---|---|---|---|
 | T1 | Which FLORT variable is backscatter, and how do I get particulate backscatter? | flort | `optical_backscatter` (L2); [HIGH] not `total_volume_scattering_coefficient` (L1); `b_bp = optical_backscatter − seawater_scattering_coefficient/2` | R1 |
-| T2 | Half my chlorophyll samples fail `qc_results`. Should I drop them? | flort | mostly stuck-value; decode with `qc_executed`; 0 bit = failed *or not run*; [HIGH] don't discard on stuck-value alone | — |
-| T3 | Is the CDOM in OOI fluorometer files really a CDOM concentration? | flort | fluorescence → FDOM proxy; ppb relative to factory standard; treat as relative index | — |
+| T2 | Half my chlorophyll samples fail `qc_results`. Should I drop them? | flort | mostly stuck-value; decode with `qc_executed`; 0 bit = failed *or not run*; [HIGH] don't discard on stuck-value alone | ✓ |
+| T3 | Is the CDOM in OOI fluorometer files really a CDOM concentration? | flort | fluorescence → FDOM proxy; ppb relative to factory standard; treat as relative index | ✓ |
 | T4 | Can I compare OOI fluorometer chlorophyll with bottle or satellite chlorophyll? | flort | ~2× factory overestimate (Roesler 2017); daytime quenching; low-signal quantization; relative vs absolute | R-Chl |
 | T5 | How do I compute mixed layer depth from shallow profiler CTD data? | ctd, shallow-profiler | [HIGH] density is in-situ → compute σ₀ with GSW; split stream with profile index; ascent; fouling windows; threshold/H&T methods; reference-depth caveat | R2 |
-| T6 | Salinity at Slope Base drops ~2 PSU for a week one December. Plume or bad data? | ctd | conductivity-cell fouling events (project-experience dates); check temperature unchanged + conductivity QARTOD suspect; salinity can pass its own QC | — |
-| T7 | Do I need a separate oxygen download for the shallow profiler? Which variable and units? | ctd | DO is in the CTD stream; `corrected_dissolved_oxygen`; µmol kg⁻¹; duplicate DOCONCF variable | — |
+| T6 | Salinity at Slope Base drops ~2 PSU for a week one December. Plume or bad data? | ctd | conductivity-cell fouling events (project-experience dates); check temperature unchanged + conductivity QARTOD suspect; salinity can pass its own QC | ✓ |
+| T7 | Do I need a separate oxygen download for the shallow profiler? Which variable and units? | ctd | DO is in the CTD stream; `corrected_dissolved_oxygen`; µmol kg⁻¹; duplicate DOCONCF variable | ✓ |
 | T8 | How do I pull individual profiles out of a month-long file? What is a GPI? | shallow-profiler | profile index repo + `start/peak/end` (UTC); slicing code; GPI = running profile number, unique per profiler; check empty slices | R3 |
-| T9 | How do I find the midnight and noon profiles? | shallow-profiler | #4 and #9 (UTC-day index); [HIGH] identify by long descent (~95 vs ~34 min), not by counting; #4 ≈ 08:30 UTC, #9 ≈ 21:50 UTC | — |
+| T9 | How do I find the midnight and noon profiles? | shallow-profiler | #4 and #9 (UTC-day index); [HIGH] identify by long descent (~95 vs ~34 min), not by counting; #4 ≈ 08:30 UTC, #9 ≈ 21:50 UTC | ✓ |
 | T10 | Compare nitrate and oxygen profiles for remineralization. | nitrate, ctd, shallow-profiler | `salinity_corrected_nitrate`; µmol L⁻¹ vs µmol kg⁻¹ conversion; match #4/#9 GPIs, ascent, common depth grid; bottle-check caveat | R4 |
-| T11 | Why does my corrected nitrate go negative near the surface? | nitrate | T/S correction near true zero; ~1% of values; treat as ≈ 0; don't drop (bias); global-range "failures" = negatives | — |
+| T11 | Why does my corrected nitrate go negative near the surface? | nitrate | T/S correction near true zero; ~1% of values; treat as ≈ 0; don't drop (bias); global-range "failures" = negatives | ✓ |
 | T12 | How do I get clean pH and pCO₂ profiles, and can I compute the carbonate system? | ph, pco2 | descents of #4/#9, `peak → end`; ~12–13 readings; off-profile ~190 m samples differ (pH one per profile vs pCO₂ parked); QARTOD screening; pH + pCO₂ poor pair for TA/DIC | R5 |
-| T13 | What is the pCO₂ `_cal` file and do I need it? | pco2 | blank measurements, ~1 per 5 days; already applied in the data file; only for diagnosing blank drift | — |
+| T13 | What is the pCO₂ `_cal` file and do I need it? | pco2 | blank measurements, ~1 per 5 days; already applied in the data file; only for diagnosing blank drift | ✓ |
 | T14 | Estimate light attenuation and euphotic depth from PAR and relate it to chlorophyll. | par, flort | `par_counts_output`; ignore PAR QARTOD; dark threshold before logs; daylight profiles by local solar time; Kd from ln(PAR); surface not reached; quenching interaction | R6 |
-| T15 | Every PAR sample is flagged as failed. Is the PAR data bad? | par | QARTOD runs on raw counts → fails all; calibrated variable has no QARTOD; [HIGH] ignore that flag; negatives = darkness | — |
-| T16 | Does the profiler always reach the surface? How does that affect MLD and surface PAR? | ctd, par, shallow-profiler | shallowest point often 5–20 m (~15 m in the Jan example); check reference depth before MLD threshold; extrapolate surface PAR | — |
-| T17 | *(out of scope)* How do I get ADCP current data for the Slope Base shallow profiler? | — | says the corpus doesn't yet cover currents (planned page); no invented variable names or URLs | — |
-| T18 | *(out of scope)* What are typical oxygen values at 2,000 m on the Axial Base deep profiler? | — | says the corpus covers shallow profilers only; no guessed values | — |
+| T15 | Every PAR sample is flagged as failed. Is the PAR data bad? | par | QARTOD runs on raw counts → fails all; calibrated variable has no QARTOD; [HIGH] ignore that flag; negatives = darkness | ✓ |
+| T16 | Does the profiler always reach the surface? How does that affect MLD and surface PAR? | ctd, par, shallow-profiler | shallowest point often 5–20 m (~15 m in the Jan example); check reference depth before MLD threshold; extrapolate surface PAR | ✓ |
+| T17 | *(out of scope)* How do I get ADCP current data for the Slope Base shallow profiler? | — | says the corpus doesn't yet cover currents (planned page); no invented variable names or URLs | ✓ |
+| T18 | *(out of scope)* What are typical oxygen values at 2,000 m on the Axial Base deep profiler? | — | says the corpus covers shallow profilers only; no guessed values | ✓ |
 
 
 ## Results
@@ -229,12 +230,37 @@ euphotic depth with caveats; and the cross-sensor insight that the daylight prof
 are where chlorophyll is quenched. Ratings correct. **Error:** answer truncated at the 2,000-token
 output limit. **Fix:** `ask.py` limit raised to 4,000 with a truncation notice.
 
+**Batch run of the remaining tests (T2, T3, T6, T7, T9, T11, T13, T15, T16, T17, T18).** All
+**passed** — every must-include fact present, ratings copied correctly, no invented URLs, no
+rating drift. Highlights and notes:
+
+- **T2 (FLORT QC):** correctly stated 0 bit = "failed *or not run*" — the R1 error is fixed and
+  the stricter prompt held.
+- **T3 (CDOM):** FDOM proxy, ppb relative to factory standard, "not a reportable concentration".
+- **T6 (salinity drop):** diagnosed conductivity-cell fouling, gave the temperature-unchanged /
+  conductivity-suspect checks and the December precedent.
+- **T7 (oxygen):** DO in the CTD stream, `corrected_dissolved_oxygen`, µmol kg⁻¹, duplicate noted.
+- **T9 (midnight/noon):** #4/#9 by long descent not by counting; profile-index code; UTC times.
+- **T11 (negative nitrate):** correction artifact near true zero, treat as ≈0, don't drop.
+- **T13 (`_cal` file):** blanks, ~1/5 days, already applied, only for diagnostics.
+- **T15 (PAR all-failed):** ignore PAR QARTOD (runs on raw counts); use `par_counts_output`;
+    negatives = darkness.
+- **T16 (surface reach):** profiler stops ~15 m; truncates shallow MLD; extrapolate surface PAR.
+- **T17 (out of scope — currents):** declined cleanly, pointed to Data Explorer; hit the same
+    `currents.md` 404 (the index lists a still-planned page — remove or write it).
+- **T18 (out of scope — deep profiler):** declined cleanly; correctly inferred the `RS03AXPD`
+    deep-profiler designator and pointed to official sources, without guessing oxygen values.
+
+**Test bank: 16 of 16 in-scope + both out-of-scope all pass.** No corpus fixes required from this
+batch. Remaining nit: `llms.txt` lists `currents.md` as a planned page that 404s (T17) — either
+write it or drop the entry so nothing in the index points at a missing page.
+
 
 ## To-dos
 
 **Build / corpus:**
-- [ ] Run the un-run tests: T2, T3, T6, T7, T9, T11, T13, T15, T16, and the out-of-scope T17–T18;
-      record results; fix the corpus where they fail.
+- [x] Run the full test bank (T1–T18): all pass; no corpus fixes needed from the final batch.
+- [ ] Remove or write `currents.md` — `llms.txt` lists it but it 404s (surfaced by T17).
 - [ ] Remaining general pages: data access, QC flags, currents; the two reference indexes.
 - [ ] `tools/zenodo_catalog.py` → `docs/datasets.md`.
 - [ ] Delete the ~1.5 GB of downloaded source files under `~/ooi/sb/ooinet/scalar/2018_*` once no
