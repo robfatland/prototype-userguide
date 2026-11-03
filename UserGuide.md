@@ -329,6 +329,37 @@ Usage: `python client/ask.py "What current data exist at shallow profiler sites?
   input / output tokens; confirm in billing). Prompt caching or the `global.` profile would cut it.
 
 
+## Test bank (v0 draft — for Rob to edit)
+
+Each test lists the corpus pages a good answer should draw on and the **must-include facts**
+(pass = all present, nothing contradicted, ratings not raised/invented, no URL outside the corpus).
+"Run" marks tests already executed (see Results). The last two are **out-of-scope** checks: the
+correct answer says the corpus doesn't cover it, without guessing.
+
+| # | Question | Pages | Must include | Run |
+|---|---|---|---|---|
+| T1 | Which FLORT variable is backscatter, and how do I get particulate backscatter? | flort | `optical_backscatter` (L2); [HIGH] not `total_volume_scattering_coefficient` (L1); `b_bp = optical_backscatter − seawater_scattering_coefficient/2` | R1 |
+| T2 | Half my chlorophyll samples fail `qc_results`. Should I drop them? | flort | mostly stuck-value; decode with `qc_executed`; 0 bit = failed *or not run*; [HIGH] don't discard on stuck-value alone | — |
+| T3 | Is the CDOM in OOI fluorometer files really a CDOM concentration? | flort | fluorescence → FDOM proxy; ppb relative to factory standard; treat as relative index | — |
+| T4 | Can I compare OOI fluorometer chlorophyll with bottle or satellite chlorophyll? | flort | ~2× factory overestimate (Roesler 2017); daytime quenching; low-signal quantization; relative vs absolute | — |
+| T5 | How do I compute mixed layer depth from shallow profiler CTD data? | ctd, shallow-profiler | [HIGH] density is in-situ → compute σ₀ with GSW; split stream with profile index; ascent; fouling windows; threshold/H&T methods; reference-depth caveat | R2 |
+| T6 | Salinity at Slope Base drops ~2 PSU for a week one December. Plume or bad data? | ctd | conductivity-cell fouling events (project experience dates); check temperature unchanged + conductivity QARTOD suspect; salinity can pass its own QC | — |
+| T7 | Do I need a separate oxygen download for the shallow profiler? Which variable and units? | ctd | DO is in the CTD stream; `corrected_dissolved_oxygen`; µmol kg⁻¹; duplicate DOCONCF variable | — |
+| T8 | How do I pull individual profiles out of a month-long file? What is a GPI? | shallow-profiler | profile index repo + `start/peak/end` (UTC); slicing code; GPI = running profile number, unique per profiler; check empty slices | R3 |
+| T9 | How do I find the midnight and noon profiles? | shallow-profiler | #4 and #9 (UTC-day index); [HIGH] identify by long descent (~95 vs ~34 min), not by counting; #4 ≈ 08:30 UTC, #9 ≈ 21:50 UTC | — |
+| T10 | Compare nitrate and oxygen profiles for remineralization. | nitrate, ctd, shallow-profiler | `salinity_corrected_nitrate`; µmol L⁻¹ vs µmol kg⁻¹ conversion; match #4/#9 GPIs, ascent, common depth grid; bottle-check caveat | R4 |
+| T11 | Why does my corrected nitrate go negative near the surface? | nitrate | T/S correction near true zero; ~1% of values; treat as ≈ 0; don't drop (bias); global-range "failures" = negatives | — |
+| T12 | How do I get clean pH and pCO₂ profiles, and can I compute the carbonate system? | ph, pco2 | descents of #4/#9, `peak → end`; ~12–13 readings; off-profile ~190 m samples differ (pH one per profile vs pCO₂ parked); QARTOD screening; pH + pCO₂ poor pair for TA/DIC | R5 |
+| T13 | What is the pCO₂ `_cal` file and do I need it? | pco2 | blank measurements, ~1 per 5 days; already applied in the data file; only for diagnosing blank drift | — |
+| T14 | Estimate light attenuation and euphotic depth from PAR and relate it to chlorophyll. | par, flort | `par_counts_output`; ignore PAR QARTOD; dark threshold before logs; daylight profiles by local solar time; Kd from ln(PAR); surface not reached; quenching interaction | R6 |
+| T15 | Every PAR sample is flagged as failed. Is the PAR data bad? | par | QARTOD runs on raw counts → fails all; calibrated variable has no QARTOD; [HIGH] ignore that flag; negatives = darkness | — |
+| T16 | Does the profiler always reach the surface? How does that affect MLD and surface PAR? | ctd, par, shallow-profiler | shallowest point often 5–20 m (~15 m in the Jan example); check reference depth before MLD threshold; extrapolate surface PAR | — |
+| T17 | *(out of scope)* How do I get ADCP current data for the Slope Base shallow profiler? | — | says the corpus doesn't yet cover currents (planned page); no invented variable names or URLs | — |
+| T18 | *(out of scope)* What are typical oxygen values at 2,000 m on the Axial Base deep profiler? | — | says the corpus covers shallow profilers only; no guessed values | — |
+
+Tests T1–T16 cover all seven pages; seven are cross-page. Six have been run (R1–R6).
+
+
 ## Results
 
 ### FLORT backscatter query
