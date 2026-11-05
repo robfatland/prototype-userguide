@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OOI Prototype User Guide — ask</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 820px;
+         margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; line-height: 1.45; }
+  h1 { font-size: 1.3rem; color: #123a5e; }
+  .note { color: #55606b; font-size: 0.9rem; }
+  textarea { width: 100%; box-sizing: border-box; font-size: 1rem; padding: 0.6rem; }
+  input { font-size: 1rem; padding: 0.4rem; width: 16rem; }
+  button { font-size: 1rem; padding: 0.5rem 1.2rem; background: #123a5e; color: #fff;
+           border: 0; border-radius: 4px; cursor: pointer; }
+  button:disabled { background: #9aa6b2; cursor: default; }
+  #answer { white-space: pre-wrap; background: #f4f7fa; border: 1px solid #d7dee6;
+            border-radius: 6px; padding: 1rem; margin-top: 1rem; min-height: 2rem; }
+  .meta { color: #55606b; font-size: 0.8rem; margin-top: 0.4rem; }
+</style>
+</head>
+<body>
+  <h1>OOI Prototype User Guide — ask a question</h1>
+  <p class="note">
+    An <b>unofficial, experimental</b> demo. It answers practical questions about using OOI
+    shallow-profiler data from a small curated corpus (<a href="llms.txt">llms.txt</a>), via an
+    AI model. Not affiliated with or endorsed by any observatory program; official sources take
+    precedence. This is a shared, invite-only demo with a daily usage budget — please be gentle.
+  </p>
+
+  <p>
+    <label>Access code: <input id="token" placeholder="ooi-…" autocomplete="off"></label>
+  </p>
+  <p>
+    <textarea id="q" rows="3"
+      placeholder="e.g. Which FLORT variable should I use for backscatter, and should I drop QC-failed samples?"></textarea>
+  </p>
+  <p><button id="go">Ask</button></p>
+
+  <div id="answer"></div>
+  <div class="meta" id="meta"></div>
+
+<script>
+// Set this to your deployed Lambda Function URL after deploy.
+const ENDPOINT = "REPLACE_WITH_FUNCTION_URL";
+
+// Prefill the access code from ?token=... in the link we email out.
+const params = new URLSearchParams(location.search);
+if (params.get("token")) document.getElementById("token").value = params.get("token");
+
+const btn = document.getElementById("go");
+btn.addEventListener("click", async () => {
+  const token = document.getElementById("token").value.trim();
+  const question = document.getElementById("q").value.trim();
+  const out = document.getElementById("answer");
+  const meta = document.getElementById("meta");
+  if (!question) { out.textContent = "Type a question first."; return; }
+  btn.disabled = true; out.textContent = "Thinking…"; meta.textContent = "";
+  try {
+    const r = await fetch(ENDPOINT, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, question })
+    });
+    const d = await r.json();
+    if (d.answer) {
+      out.textContent = d.answer;
+      if (d.tokens) meta.textContent =
+        `tokens: ${d.tokens.in} in / ${d.tokens.out} out · today's spend $${d.spend_today_usd}`;
+    } else {
+      out.textContent = d.message || d.error || "Something went wrong.";
+    }
+  } catch (e) {
+    out.textContent = "Network error: " + e;
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

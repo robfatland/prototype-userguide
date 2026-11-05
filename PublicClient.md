@@ -170,10 +170,36 @@ Call it **~1–2 days**. No new services beyond AWS Lambda + DynamoDB/S3 (both f
 scale), on top of the Bedrock access we already use.
 
 
-## Open questions
+## Decisions (settled Nov 2026) and build status
 
-- Account: run this in `securecomputing` (084375582624), same as the client? Confirm.
-- Daily spend cap value, and token expiry window (through AGU? a fixed date?).
-- How many invite tokens, and shared vs one-per-person (one-per-person makes revocation and
-  "who used what" cleaner).
-- Model: keep Sonnet 4.6, or offer Haiku as a cheaper default for the public demo?
+**Code written** (not yet deployed) in `public/` + `docs/ask.html`:
+- `public/state.py` — DynamoDB state (token, frozen flag, per-day spend counter).
+- `public/ask_lambda.py` — the request handler: freeze check → token check → daily-cap check →
+  Bedrock `ask()` loop → atomic spend update. Frozen/bad-token/over-cap all return before any
+  Bedrock call.
+- `public/burn_lambda.py` — daily "24 Hour Burn" email (scheduled).
+- `public/admin.py` — operator CLI: `status`, `freeze`, `unfreeze`, `redo` (expire+reissue the
+  token and print the link), `burn` (send the email now).
+- `docs/ask.html` — the browser page (served from GitHub Pages; prefills `?token=`).
+- `public/DEPLOY.md` — step-by-step AWS deploy.
+
+**Decisions:**
+- **Account / region:** `securecomputing` (084375582624), `us-west-2`. **Model:** Sonnet 4.6.
+- **Auth:** a **single shared token** (one link emailed to ~10 people). `redo` rotates it when
+  abused; the $10/day cap is the real protection, the token just keeps the public out.
+- **Daily cap:** **$10/day**, checked before every Bedrock call.
+- **Alert email:** `rob5@uw.edu`, carried as the `ALERT_EMAIL` env var (not in source).
+- **Only unbounded cost = Bedrock tokens**, gated by the cap. Frozen/bad-token/over-cap paths
+  do not call Bedrock (micro-cost only). Lambda/DynamoDB/SES are free-tier/pennies and bounded by
+  request volume.
+
+**Messages:**
+- *Daily burn* — subject exactly `OOI Prototype User Guide 24 Hour Burn`: spend vs cap, questions
+  answered (+ blocked breakdown), tokens in/out, ACTIVE/FROZEN, token last-4, cumulative.
+- *Over-cap trip* — subject `OOI Prototype User Guide — daily cap reached`, sent once the first
+  time a day hits $10.
+- *When blocked (browser)* — bad token / over-cap / frozen each get a plain user-facing sentence.
+
+**Still to do (operator actions, see `public/DEPLOY.md`):** verify SES email; create table, IAM
+role, the two Lambdas, the Function URL, the daily schedule, an AWS Budgets backstop; paste the
+Function URL into `docs/ask.html`; `admin.py redo` to mint the first token; email the link.
