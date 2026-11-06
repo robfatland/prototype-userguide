@@ -48,15 +48,35 @@ aws lambda create-function --function-name ooi-ug-burn \
 ```
 `boto3` is in the Lambda runtime already; no extra dependency layer needed.
 
-## 5. HTTPS endpoint for the ask Lambda
+## 5. HTTPS endpoint for the ask Lambda — use API Gateway, NOT a Function URL
+
+**Important (learned the hard way):** the `securecomputing` account is in the UW eScience AWS
+Organization, and an org SCP **denies `lambda:InvokeFunctionUrl`**. A public (`AuthType NONE`)
+Function URL returns 403 AccessDenied, and fronting it with CloudFront + OAC does *not* help —
+the SCP denies the action for the CloudFront service principal too. Use an **API Gateway HTTP API
+with a Lambda proxy integration** instead; that uses `lambda:InvokeFunction`, which the SCP allows.
+
 ```
-aws lambda create-function-url-config --function-name ooi-ug-ask --auth-type NONE \
-  --cors "AllowOrigins=*,AllowMethods=POST,AllowHeaders=content-type"
-aws lambda add-permission --function-name ooi-ug-ask --statement-id furl \
-  --action lambda:InvokeFunctionUrl --principal "*" --function-url-auth-type NONE
+# HTTP API with proxy integration (payload format 2.0 — matches the handler's event shape) + CORS.
+API_ID=$(aws apigatewayv2 create-api --name ooi-ug-http --protocol-type HTTP \
+  --target arn:aws:lambda:us-west-2:084375582624:function:ooi-ug-ask \
+  --cors-configuration AllowOrigins='*',AllowMethods='POST,OPTIONS',AllowHeaders='content-type' \
+  --query ApiId --output text)
+
+# allow API Gateway to invoke the Lambda
+aws lambda add-permission --function-name ooi-ug-ask --statement-id apigw-invoke \
+  --action lambda:InvokeFunction --principal apigateway.amazonaws.com \
+  --source-arn "arn:aws:execute-api:us-west-2:084375582624:$API_ID/*/*"
+
+# the endpoint:
+aws apigatewayv2 get-api --api-id "$API_ID" --query ApiEndpoint --output text
 ```
-Copy the returned FunctionUrl into `docs/ask.html` (replace `REPLACE_WITH_FUNCTION_URL`), commit,
-and push so GitHub Pages serves it.
+`create-api --target` auto-creates the integration, the `$default` route, and an auto-deploy
+`$default` stage. Copy the ApiEndpoint into `docs/ask.html` (`const ENDPOINT = ...`), commit, and
+push so GitHub Pages serves it. The handler reads `event.requestContext.http.method` and
+`event.body`, which is exactly the HTTP API payload-format-2.0 shape — no handler change needed.
+
+Current live endpoint: `https://q1uauf9sq2.execute-api.us-west-2.amazonaws.com/` (API id `q1uauf9sq2`).
 
 ## 6. Daily burn schedule (~00:05 UTC)
 ```
@@ -87,5 +107,8 @@ python admin.py status      # sanity check
 - `python admin.py burn`     — send the daily email now (test)
 
 ## Teardown
-Delete the two Lambdas, the Function URL, the schedule, and the DynamoDB table. Nothing else
-persists cost.
+Delete the two Lambdas, the API Gateway HTTP API (`aws apigatewayv2 delete-api --api-id q1uauf9sq2`),
+the EventBridge daily rule, and the DynamoDB table. Nothing else persists cost.
+
+The ask Lambda still has an (unreachable, AWS_IAM) Function URL left over from the first attempt;
+it is harmless and can be deleted with `aws lambda delete-function-url-config --function-name ooi-ug-ask`.
