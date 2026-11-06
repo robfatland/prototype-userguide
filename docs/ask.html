@@ -14,8 +14,26 @@
   button { font-size: 1rem; padding: 0.5rem 1.2rem; background: #123a5e; color: #fff;
            border: 0; border-radius: 4px; cursor: pointer; }
   button:disabled { background: #9aa6b2; cursor: default; }
-  #answer { white-space: pre-wrap; background: #f4f7fa; border: 1px solid #d7dee6;
-            border-radius: 6px; padding: 1rem; margin-top: 1rem; min-height: 2rem; }
+  #answer { background: #f4f7fa; border: 1px solid #d7dee6;
+            border-radius: 6px; padding: 0.4rem 1rem; margin-top: 1rem; min-height: 2rem; }
+  /* while thinking / on errors we show plain text in this class */
+  #answer.plain { white-space: pre-wrap; }
+  #answer p { margin: 0.6rem 0; }
+  #answer h1, #answer h2, #answer h3 { color: #123a5e; margin: 0.8rem 0 0.4rem; line-height: 1.25; }
+  #answer h1 { font-size: 1.15rem; } #answer h2 { font-size: 1.05rem; } #answer h3 { font-size: 1rem; }
+  #answer ul, #answer ol { margin: 0.4rem 0; padding-left: 1.4rem; }
+  #answer li { margin: 0.2rem 0; }
+  #answer code { background: #e7edf3; padding: 0.1rem 0.3rem; border-radius: 3px;
+                 font-size: 0.9em; font-family: ui-monospace, Consolas, monospace; }
+  #answer pre { background: #e7edf3; padding: 0.7rem; border-radius: 5px; overflow-x: auto; }
+  #answer pre code { background: none; padding: 0; }
+  #answer a { color: #1a5fa0; }
+  #answer blockquote { border-left: 3px solid #c3cfdb; margin: 0.6rem 0; padding: 0.1rem 0.9rem;
+                       color: #45505b; }
+  #answer hr { border: 0; border-top: 1px solid #d7dee6; margin: 0.9rem 0; }
+  #answer table { border-collapse: collapse; margin: 0.6rem 0; }
+  #answer th, #answer td { border: 1px solid #d7dee6; padding: 0.3rem 0.6rem; text-align: left; }
+  #answer :first-child { margin-top: 0; } #answer :last-child { margin-bottom: 0; }
   .meta { color: #55606b; font-size: 0.8rem; margin-top: 0.4rem; }
 </style>
 </head>
@@ -40,24 +58,45 @@
   <div id="answer"></div>
   <div class="meta" id="meta"></div>
 
+<!-- Markdown rendering: marked (parser) + DOMPurify (sanitizer). The answer text is
+     model-generated, so we always sanitize before inserting as HTML. -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <script>
 // Public endpoint: API Gateway HTTP API (proxy integration) in front of the ooi-ug-ask
 // Lambda. Function URLs are blocked by the UW org SCP, so we invoke via API Gateway's
 // lambda:InvokeFunction path instead.
 const ENDPOINT = "https://q1uauf9sq2.execute-api.us-west-2.amazonaws.com/";
 
+// Render markdown -> sanitized HTML into #answer. Falls back to plain text if the
+// libraries failed to load (e.g. offline).
+function renderAnswer(md) {
+  if (window.marked && window.DOMPurify) {
+    out.classList.remove("plain");
+    out.innerHTML = DOMPurify.sanitize(marked.parse(md, { breaks: true }));
+    // open corpus/source links in a new tab
+    out.querySelectorAll("a[href]").forEach(a => {
+      a.target = "_blank"; a.rel = "noopener noreferrer";
+    });
+  } else {
+    out.classList.add("plain");
+    out.textContent = md;
+  }
+}
+function showPlain(text) { out.classList.add("plain"); out.textContent = text; }
+
 // Prefill the access code from ?token=... in the link we email out.
 const params = new URLSearchParams(location.search);
 if (params.get("token")) document.getElementById("token").value = params.get("token");
 
+const out = document.getElementById("answer");
+const meta = document.getElementById("meta");
 const btn = document.getElementById("go");
 btn.addEventListener("click", async () => {
   const token = document.getElementById("token").value.trim();
   const question = document.getElementById("q").value.trim();
-  const out = document.getElementById("answer");
-  const meta = document.getElementById("meta");
-  if (!question) { out.textContent = "Type a question first."; return; }
-  btn.disabled = true; out.textContent = "Thinking…"; meta.textContent = "";
+  if (!question) { showPlain("Type a question first."); return; }
+  btn.disabled = true; showPlain("Thinking…"); meta.textContent = "";
   try {
     const r = await fetch(ENDPOINT, {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -65,14 +104,14 @@ btn.addEventListener("click", async () => {
     });
     const d = await r.json();
     if (d.answer) {
-      out.textContent = d.answer;
+      renderAnswer(d.answer);
       if (d.tokens) meta.textContent =
         `tokens: ${d.tokens.in} in / ${d.tokens.out} out · today's spend $${d.spend_today_usd}`;
     } else {
-      out.textContent = d.message || d.error || "Something went wrong.";
+      showPlain(d.message || d.error || "Something went wrong.");
     }
   } catch (e) {
-    out.textContent = "Network error: " + e;
+    showPlain("Network error: " + e);
   } finally {
     btn.disabled = false;
   }
