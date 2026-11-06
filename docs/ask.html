@@ -38,12 +38,12 @@
 </style>
 </head>
 <body>
-  <h1>OOI Prototype User Guide — ask a question</h1>
+  <h1>OOI Prototype User Guide (unofficial + experimental) — ask a question</h1>
   <p class="note">
-    An <b>unofficial, experimental</b> demo. It answers practical questions about using OOI
-    shallow-profiler data from a small curated corpus (<a href="llms.txt">llms.txt</a>), via an
-    AI model. Not affiliated with or endorsed by any observatory program; official sources take
-    precedence. This is a shared, invite-only demo with a daily usage budget — please be gentle.
+    This prototype answers practical questions concerning scalar sensors (temp, salinity etcetera)
+    on the three shallow profiler scince pods. The RAG resource is a small curated corpus 
+    (<a href="llms.txt">llms.txt</a>) connected to an LLM. This invite-only demo is intended
+    only for light 'feasibility evaluation' use.
   </p>
 
   <p>
@@ -51,7 +51,7 @@
   </p>
   <p>
     <textarea id="q" rows="3"
-      placeholder="e.g. Which FLORT variable should I use for backscatter, and should I drop QC-failed samples?"></textarea>
+      placeholder="example: Which fluorometer variable should I use for backscatter? And should I drop QC-failed samples?"></textarea>
   </p>
   <p><button id="go">Ask</button></p>
 
