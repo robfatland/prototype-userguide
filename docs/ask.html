@@ -41,8 +41,10 @@
   <div class="meta" id="meta"></div>
 
 <script>
-// Set this to your deployed Lambda Function URL after deploy.
-const ENDPOINT = "https://56lueygmljl77l2fzqmddy3lsq0dudey.lambda-url.us-west-2.on.aws/";
+// Public endpoint: API Gateway HTTP API (proxy integration) in front of the ooi-ug-ask
+// Lambda. Function URLs are blocked by the UW org SCP, so we invoke via API Gateway's
+// lambda:InvokeFunction path instead.
+const ENDPOINT = "https://q1uauf9sq2.execute-api.us-west-2.amazonaws.com/";
 
 // Prefill the access code from ?token=... in the link we email out.
 const params = new URLSearchParams(location.search);
